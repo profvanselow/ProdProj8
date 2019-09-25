@@ -26,9 +26,17 @@ public class Controller {
   private Button btnAddProduct;
 
   @FXML
+  private Button btnRecordProduction;
+
+  @FXML
   private ComboBox<String> cbQuantity;
   // although the combobox contains integers it becomes a textbox that returns a string once made editable
   // so it was easiest just to make it String
+
+  @FXML
+  void recordProduce(ActionEvent event) {
+    System.out.println(cbQuantity.getValue());
+  }
 
   @FXML
   void addProduct(ActionEvent event) {
@@ -70,8 +78,10 @@ public class Controller {
     cbQuantity.getItems().add("8");
     cbQuantity.getItems().add("9");
     cbQuantity.getItems().add("10");
-    cbQuantity.getSelectionModel().selectFirst();
+
     cbQuantity.setEditable(true);
+    cbQuantity.getSelectionModel().selectFirst();
+    System.out.println(cbQuantity.getValue());
     // better add https://stackoverflow.com/questions/47878484/generate-list-of-int-to-populate-combobox-in-javafx
 
     initializeDB();
@@ -79,8 +89,12 @@ public class Controller {
 
   private void initializeDB() {
     System.out.println("in initializeDB");
+    
+  }
 
-
+  // not seeing this called
+  public void close() {
+    System.out.println("close called");
   }
 
 }
