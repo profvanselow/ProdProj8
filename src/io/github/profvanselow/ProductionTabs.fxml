@@ -62,12 +62,12 @@
       <Label layoutX="14.0" layoutY="240.0" text="Choose Quantity"/>
       <ComboBox fx:id="cbQuantity" layoutX="14.0" layoutY="264.0" prefWidth="150.0"/>
       <Button fx:id="btnRecordProduction" layoutX="14.0" layoutY="305.0"
-        mnemonicParsing="false" onAction="#recordProduce" text="Record Production"/>
+        mnemonicParsing="false" onAction="#recordProduction" text="Record Production"/>
     </AnchorPane>
   </Tab>
   <Tab text="Production Log">
     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-      <TextArea layoutX="14.0" layoutY="14.0" prefHeight="346.0" prefWidth="574.0"/>
+      <TextArea fx:id="taViewProd" layoutX="14.0" layoutY="14.0" prefHeight="346.0" prefWidth="574.0"/>
     </AnchorPane>
   </Tab>
 </TabPane>
