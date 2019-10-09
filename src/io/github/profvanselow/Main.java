@@ -10,6 +10,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
+        setUserAgentStylesheet(STYLESHEET_CASPIAN);
         Parent root = FXMLLoader.load(getClass().getResource("ProductionTabs.fxml"));
         primaryStage.setTitle("Production Recorder");
         primaryStage.setScene(new Scene(root, 600, 475));

@@ -98,6 +98,7 @@ public class ProductionTabsController {
     setupProductLineTable();
     lvProductLine.setItems(oProductLine);
     loadProductList();
+    loadProductionLog();
   }
 
   private void initializeDB() {
