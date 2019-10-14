@@ -50,9 +50,9 @@ public class ProductionRecord {
   }
 
   // enhanced constructor used when adding from UI that builds serial num
-  public ProductionRecord(int productID, Product product, int typeCount) {
+  public ProductionRecord(Product product, int typeCount) {
     this.productionNum = 0; // set to 0 temporarily, allow database to autoincrement
-    this.productID = productID;
+    this.productID = product.getId();
     // Sets the serialNumber to start with the first three letters of the Manufacturer name,
     // then the two letter ItemType code,
     // then five digits (with leading 0s if necessary) that are unique and sequential for the item type.
@@ -70,7 +70,7 @@ public class ProductionRecord {
   }
 
   public String toString() {
-    return "Production Num: " + productionNum + " Product ID: " + productID + " Serial Num: "
+    return "Prod. Num: " + productionNum + " Product ID: " + productID + " Serial Num: "
         + serialNum + " Date: " + prodDate;
   }
 }

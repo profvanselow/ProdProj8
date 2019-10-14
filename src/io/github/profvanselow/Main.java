@@ -8,18 +8,14 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-    //<editor-fold desc="start
-    // ">
     @Override
     public void start(Stage primaryStage) throws Exception{
         setUserAgentStylesheet(STYLESHEET_CASPIAN);
         Parent root = FXMLLoader.load(getClass().getResource("ProductionTabs.fxml"));
         primaryStage.setTitle("Production Recorder");
-        primaryStage.setScene(new Scene(root, 600, 475));
+        primaryStage.setScene(new Scene(root, 600, 550));
         primaryStage.show();
     }
-    //</editor-fold>
-
 
     public static void main(String[] args) {
         launch(args);

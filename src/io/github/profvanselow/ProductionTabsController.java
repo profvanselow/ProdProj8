@@ -306,7 +306,7 @@ public class ProductionTabsController {
         System.out.println("Bad Type for item type in load production log");
     }
     for (int productionRunProduct = 0; productionRunProduct < numProduced; productionRunProduct++) {
-      ProductionRecord pr = new ProductionRecord(selectedProduct.getId(), selectedProduct, typeCount++);
+      ProductionRecord pr = new ProductionRecord(selectedProduct, typeCount++);
       //productionLog.add(pr);
       productionRun.add(pr);
     }
@@ -339,7 +339,7 @@ public class ProductionTabsController {
         }
       }
 
-      fieldContent.append("Production Num: ").append(pr.getProductionNum())
+      fieldContent.append("Prod. Num: ").append(pr.getProductionNum())
           .append(" Product Name: ")
           .append(productName).append(" Serial Num: ").append(pr.getSerialNum()).append(" Date: ").
           append(pr.getProdDate()).append("\n");
