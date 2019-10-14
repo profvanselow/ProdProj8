@@ -71,7 +71,6 @@ public class ProductionTabsController {
   @FXML
   private ListView<Product> lvProductLine;
 
-
   public void initialize() {
 
     // test classes
@@ -176,7 +175,7 @@ public class ProductionTabsController {
       ps.executeUpdate();
 
       System.out.println("Product added to database.");
-      taProductLine.appendText(newProduct.toString() + "\n");
+      //taProductLine.appendText(newProduct.toString() + "\n");
       loadProductList();
 
     } catch (SQLException e) {
@@ -286,7 +285,6 @@ public class ProductionTabsController {
     int typeCount = 0;
     switch (selectedProduct.getType().code) {
       case "AU":
-
         typeCount = countOfAudio;
         countOfAudio += numProduced;
         break;
@@ -415,9 +413,7 @@ public class ProductionTabsController {
       countOfVisual = 0;
       countOfAudioMobile = 0;
 
-      // STEP 4: Extract data from result set
       while (rs.next()) {
-        // Retrieve by column name
         int prodNum = rs.getInt("production_num");
         int id = rs.getInt("product_id");
         String serial = rs.getString("serial_num");
@@ -425,9 +421,7 @@ public class ProductionTabsController {
 
         ProductionRecord pr = new ProductionRecord(prodNum, id, serial, prodDate);
         productionLog.add(pr);
-        //System.out.println(serial.substring(3, 6));
         switch (serial.substring(3, 5)) {
-
           case "AU":
             countOfAudio++;
             break;
@@ -442,19 +436,13 @@ public class ProductionTabsController {
             break;
           default:
             System.out.println("Bad Type for item type in load production log");
-
         }
       }
-      // STEP 5: Clean-up environment
       rs.close();
       showProduction();
     } catch (SQLException se) {
-      // Handle errors for JDBC
       se.printStackTrace();
-
       Alert a = new Alert(Alert.AlertType.ERROR);
-
-      // show the dialog
       a.show();
 
     } catch (Exception e) {

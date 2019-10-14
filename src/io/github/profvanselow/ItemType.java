@@ -1,7 +1,5 @@
 package io.github.profvanselow;
 
-// Step 2
-// Create an enum called ItemType.
 public enum ItemType {
 
   // ItemType AUDIO = new ItemType("AU");
