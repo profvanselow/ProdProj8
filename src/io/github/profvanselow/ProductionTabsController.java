@@ -155,7 +155,7 @@ public class ProductionTabsController {
   @FXML
   void addProduct(ActionEvent event) {
 
-    //System.out.println("in addProduct");
+    System.out.println("Adding Product");
     //String pType = cbType.getValue().toString();
     ItemType iType = cbType.getValue();
     String pMan = txtManufacturer.getText();
@@ -170,7 +170,9 @@ public class ProductionTabsController {
       ps.setString(3, pName);
 
       ps.executeUpdate();
+      System.out.println("Product added to database.");
       taProductLine.appendText(newProduct.toString() + "\n");
+      loadProductList();
 
     } catch (SQLException e) {
       e.printStackTrace();

@@ -46,19 +46,21 @@ public class ProductionRecord {
     this.productionNum = 0; // set to 0 temporarily, allow database to autoincrement
     this.productID = productID;
     serialNum = "0"; // TODO: generate unique serial number by product
+
     prodDate = new Date();
   }
 
   // constructor used when populating from database
   public ProductionRecord(int prodNum, int productID, String sn, Date date) {
-    this.productionNum = prodNum; // set to 0 temporarily, allow database to autoincrement
+    this.productionNum = prodNum;
     this.productID = productID;
     serialNum = sn;
     prodDate = date;
   }
 
-  public String getRec() {
-    return "Production Num: " + productionNum + " Product ID: " + productID + " Serial Num: " + serialNum +
+  public String toString() {
+    return "Production Num: " + productionNum + " Product ID: " + productID + " Serial Num: "
+        + serialNum +
         " Date: " + prodDate;
   }
 }

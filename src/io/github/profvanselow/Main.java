@@ -8,6 +8,8 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
+    //<editor-fold desc="start
+    // ">
     @Override
     public void start(Stage primaryStage) throws Exception{
         setUserAgentStylesheet(STYLESHEET_CASPIAN);
@@ -16,6 +18,7 @@ public class Main extends Application {
         primaryStage.setScene(new Scene(root, 600, 475));
         primaryStage.show();
     }
+    //</editor-fold>
 
 
     public static void main(String[] args) {
