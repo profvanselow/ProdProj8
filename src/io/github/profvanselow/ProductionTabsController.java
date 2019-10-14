@@ -29,7 +29,7 @@ public class ProductionTabsController {
   private Connection conn = null;
   private Statement stmt = null;
 
-  private ArrayList<Product> productLine = new ArrayList<>();
+  private final ArrayList<Product> productLine = new ArrayList<>();
   private ObservableList<Product> oProductLine;
 
   private int countOfAudio = 0;
@@ -37,7 +37,7 @@ public class ProductionTabsController {
   private int countOfVisual = 0;
   private int countOfVisualMobile = 0;
 
-  private ArrayList<ProductionRecord> productionLog = new ArrayList<>();
+  private final ArrayList<ProductionRecord> productionLog = new ArrayList<>();
 
   @FXML
   private TextField txtProductName;
@@ -59,7 +59,7 @@ public class ProductionTabsController {
 
   @FXML
   private ComboBox<String> cbQuantity;
-  // although the combobox contains integers it becomes a textbox that returns a string once made
+  // although the combobox contains integers it becomes a text field that returns a string once made
   // editable so it was easiest just to make it String
 
   @FXML
@@ -85,7 +85,7 @@ public class ProductionTabsController {
     // set the default value
     cbQuantity.getSelectionModel().selectFirst();
 
-    // populate type choicebox
+    // populate type ChoiceBox
     for (ItemType type : ItemType.values()) {
       cbType.getItems().add(type);
     }
@@ -94,7 +94,7 @@ public class ProductionTabsController {
     cbType.getSelectionModel().selectFirst();
 
     // connect to database
-    initializeDB();
+    //initializeDB();
 
     // Convert the productLine ArrayList to an ObservableList to use with the TableView
     oProductLine = FXCollections.observableArrayList(productLine); // using ArrayList
@@ -105,7 +105,7 @@ public class ProductionTabsController {
     loadProductionLog();
   }
 
-  private void initializeDB() {
+  private void initializeDatabase() {
     final String JDBC_DRIVER = "org.h2.Driver";
     final String DB_URL = "jdbc:h2:./res/ProdDB";
 
@@ -115,24 +115,28 @@ public class ProductionTabsController {
 
     System.out.println("Attempting to connect to database");
     try {
-      // STEP 1: Register JDBC driver
       Class.forName(JDBC_DRIVER);
-
-      //STEP 2: Open a connection
       conn = DriverManager.getConnection(DB_URL, USER, PASS);
-
-      //STEP 3: Execute a query
       stmt = conn.createStatement();
       System.out.println("Successfully connected to database!");
     } catch (Exception e) {
       e.printStackTrace();
-
       Alert a = new Alert(Alert.AlertType.ERROR);
-
-      // show the dialog
       a.show();
     }
+  }
 
+  private void closeDatabase() {
+    System.out.println("Attempting to close database.");
+    try {
+      stmt.close();
+      conn.close();
+      System.out.println("Database closed.");
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      Alert a = new Alert(Alert.AlertType.ERROR);
+      a.show();
+    }
   }
 
   private static void playerDriver() {
@@ -164,9 +168,8 @@ public class ProductionTabsController {
     ItemType iType = cbType.getValue();
     String pMan = txtManufacturer.getText();
     String pName = txtProductName.getText();
-    Product newProduct = new Widget(pName, pMan, iType);
+    initializeDatabase();
     try {
-
       final String sql = "INSERT INTO Product(type, manufacturer, name) VALUES (?, ?, ?)";
       PreparedStatement ps = conn.prepareStatement(sql);
       ps.setString(1, iType.code);
@@ -175,17 +178,20 @@ public class ProductionTabsController {
       ps.executeUpdate();
 
       System.out.println("Product added to database.");
+      //Product newProduct = new Widget(pName, pMan, iType);
       //taProductLine.appendText(newProduct.toString() + "\n");
       loadProductList();
 
     } catch (SQLException e) {
       e.printStackTrace();
+    } finally {
+      closeDatabase();
     }
   }
 
   private void setupProductLineTable() {
 
-    TableColumn productIdCol = new TableColumn("Product ID");
+    TableColumn<Product, String> productIdCol = new TableColumn("Product ID");
     productIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
 
     TableColumn<Product, String> productNameCol = new TableColumn<>("Product Name");
@@ -204,23 +210,13 @@ public class ProductionTabsController {
 
   }
 
-  // not seeing this called
-  public void stop() {
-    System.out.println("stop called");
-  }
-
   private void loadProductList() {
-
+    initializeDatabase();
     try {
-
       String sql = "SELECT id, name, type, manufacturer FROM Product";
       ResultSet rs = stmt.executeQuery(sql);
-
       oProductLine.clear();
-
-      // STEP 4: Extract data from result set
       while (rs.next()) {
-        // Retrieve by column name
         int id = rs.getInt("id");
         String name = rs.getString("name");
         String typeCode = rs.getString("type");
@@ -253,19 +249,13 @@ public class ProductionTabsController {
       // STEP 5: Clean-up environment
       rs.close();
     } catch (SQLException se) {
-      // Handle errors for JDBC
       se.printStackTrace();
-
       Alert a = new Alert(Alert.AlertType.ERROR);
-
-      // show the dialog
       a.show();
-
     } catch (Exception e) {
-      // Handle errors for Class.forName
       e.printStackTrace();
     }
-
+    closeDatabase();
   }
   //</editor-fold>
 
@@ -348,52 +338,41 @@ public class ProductionTabsController {
 
   // writes a production run to the production record table of the database
   private void addToProductionDB(ArrayList<ProductionRecord> productionRun) {
-
+    initializeDatabase();
     try {
-
-      //STEP 3: Execute a query
       System.out.println("Inserting production records in database.");
-      ProductionRecord pr;
       Timestamp ts;
 
       //TODO: make one big insert string so there is only one SQL statement to execute
-      for (int productionRunProduct = 0; productionRunProduct < productionRun.size();
-          productionRunProduct++) {
-        pr = productionRun.get(productionRunProduct);
-
+      for (ProductionRecord pr : productionRun) {
         ts = new Timestamp(pr.getProdDate().getTime());
-
-        String sql = "INSERT INTO PRODUCTIONRECORD (PRODUCT_ID, SERIAL_NUM, DATE_PRODUCED)" +
-            " VALUES (" +
-            pr.getProductID() + ", '" +
-            pr.getSerialNum() + "', '" +
-            ts + "')";
-
-        stmt.executeUpdate(sql);
+        final String sql = "INSERT INTO PRODUCTIONRECORD (PRODUCT_ID, SERIAL_NUM, DATE_PRODUCED)"
+            + " VALUES (?, ?, ?)";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setInt(1, pr.getProductID());
+        ps.setString(2, pr.getSerialNum());
+        ps.setTimestamp(3, ts);
+        ps.executeUpdate();
         System.out.println("Record inserted in database.");
-
       }
       System.out.println("Completed inserting production records!");
     } catch (SQLException se) {
-      // Handle errors for JDBC
       se.printStackTrace();
-
       Alert a = new Alert(Alert.AlertType.ERROR);
-
-      // show the dialog
       a.show();
 
     } catch (Exception e) {
       // Handle errors for Class.forName
       e.printStackTrace();
+    } finally {
+      closeDatabase();
     }
-
   }
 
   // reads the production record database table to build the production log
   private void loadProductionLog() {
     System.out.println("loadProductionLog!");
-
+    initializeDatabase();
     try {
 
       // to use just ProductionRecord table
@@ -449,7 +428,7 @@ public class ProductionTabsController {
       // Handle errors for Class.forName
       e.printStackTrace();
     }
+    closeDatabase();
   }
   //</editor-fold>
 }
-
