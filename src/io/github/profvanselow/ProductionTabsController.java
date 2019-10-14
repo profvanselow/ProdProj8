@@ -32,6 +32,11 @@ public class ProductionTabsController {
   private ArrayList<Product> productLine = new ArrayList<>();
   private ObservableList<Product> oProductLine;
 
+  private int countOfAudio = 0;
+  private int countOfAudioMobile = 0;
+  private int countOfVisual = 0;
+  private int countOfVisualMobile = 0;
+
   private ArrayList<ProductionRecord> productionLog = new ArrayList<>();
 
   @FXML
@@ -168,8 +173,8 @@ public class ProductionTabsController {
       ps.setString(1, iType.code);
       ps.setString(2, pMan);
       ps.setString(3, pName);
-
       ps.executeUpdate();
+
       System.out.println("Product added to database.");
       taProductLine.appendText(newProduct.toString() + "\n");
       loadProductList();
@@ -277,8 +282,31 @@ public class ProductionTabsController {
     // create collection of produced items
     // don't want to add to production log yet so database can assign production number
     ArrayList<ProductionRecord> productionRun = new ArrayList<>();
+
+    int typeCount = 0;
+    switch (selectedProduct.getType().code) {
+      case "AU":
+
+        typeCount = countOfAudio;
+        countOfAudio += numProduced;
+        break;
+      case "VI":
+        typeCount = ++countOfVisual;
+        countOfVisual += numProduced;
+        break;
+      case "AM":
+        typeCount = ++countOfAudioMobile;
+        countOfAudioMobile += numProduced;
+        break;
+      case "VM":
+        typeCount = ++countOfVisualMobile;
+        countOfVisualMobile += numProduced;
+        break;
+      default:
+        System.out.println("Bad Type for item type in load production log");
+    }
     for (int productionRunProduct = 0; productionRunProduct < numProduced; productionRunProduct++) {
-      ProductionRecord pr = new ProductionRecord(selectedProduct.getId());
+      ProductionRecord pr = new ProductionRecord(selectedProduct.getId(), selectedProduct, typeCount++);
       //productionLog.add(pr);
       productionRun.add(pr);
     }
@@ -339,8 +367,8 @@ public class ProductionTabsController {
 
         String sql = "INSERT INTO PRODUCTIONRECORD (PRODUCT_ID, SERIAL_NUM, DATE_PRODUCED)" +
             " VALUES (" +
-            pr.getProductID() + ", " +
-            pr.getSerialNum() + ", '" +
+            pr.getProductID() + ", '" +
+            pr.getSerialNum() + "', '" +
             ts + "')";
 
         stmt.executeUpdate(sql);
@@ -382,28 +410,40 @@ public class ProductionTabsController {
       ResultSet rs = stmt.executeQuery(sql);
 
       productionLog.clear();
+      countOfAudio = 0;
+      countOfVisualMobile = 0;
+      countOfVisual = 0;
+      countOfAudioMobile = 0;
 
       // STEP 4: Extract data from result set
       while (rs.next()) {
         // Retrieve by column name
         int prodNum = rs.getInt("production_num");
-        // for pr
         int id = rs.getInt("product_id");
-        // for display
-        //String name = rs.getString("name");
         String serial = rs.getString("serial_num");
         Date prodDate = rs.getDate("date_produced");
 
         ProductionRecord pr = new ProductionRecord(prodNum, id, serial, prodDate);
         productionLog.add(pr);
-        //System.out.println(addedProduct);
-        //tvProductLine.getItems().add(addedProduct);
-        // Display values
-        //System.out.print("prodNum: " + prodNum);
-        //System.out.print(", id: " + id);
-        //System.out.print(", name: " + name);
-        //System.out.print(", serial: " + serial);
-        //System.out.println(", prodDate: " + prodDate);
+        //System.out.println(serial.substring(3, 6));
+        switch (serial.substring(3, 5)) {
+
+          case "AU":
+            countOfAudio++;
+            break;
+          case "VI":
+            countOfVisual++;
+            break;
+          case "AM":
+            countOfAudioMobile++;
+            break;
+          case "VM":
+            countOfVisualMobile++;
+            break;
+          default:
+            System.out.println("Bad Type for item type in load production log");
+
+        }
       }
       // STEP 5: Clean-up environment
       rs.close();
