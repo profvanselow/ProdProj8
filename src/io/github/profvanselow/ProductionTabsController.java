@@ -75,8 +75,11 @@ public class ProductionTabsController {
 
   public void initialize() {
 
+    // test Employee
+    //testEmployee();
+
     // test classes
-    playerDriver();
+    //playerDriver();
 
     // populate quantity combobox
     for (int i = 1; i <= 10; i++) {
@@ -105,6 +108,15 @@ public class ProductionTabsController {
     lvProductLine.setItems(oProductLine);
     loadProductList();
     loadProductionLog();
+  }
+
+  private void testEmployee() {
+     // System.out.println("Enter Employee Name (first last)");
+      String name = "Tim";
+      //System.out.println("Enter Employee password");
+      String password = "aBcd!";
+      Employee employee = new Employee(name, password);
+      System.out.println(employee);
   }
 
   private void initializeDatabase() {
@@ -442,4 +454,24 @@ public class ProductionTabsController {
     closeDatabase();
   }
   //</editor-fold>
+
+  // Employee
+  @FXML
+  private TextArea taEmployee;
+
+  @FXML
+  private TextField txtEmpName;
+
+  @FXML
+  private TextField txtPassword;
+
+  @FXML
+  void createEmployee(ActionEvent event) {
+    String name = txtEmpName.getText();
+    String password = txtPassword.getText();
+    Employee employee = new Employee(name, password);
+    taEmployee.clear();
+    taEmployee.appendText(employee.toString());
+
+  }
 }

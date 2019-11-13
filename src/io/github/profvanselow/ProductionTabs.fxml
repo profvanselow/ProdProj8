@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="530.0" prefWidth="620.0" tabClosingPolicy="UNAVAILABLE" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.github.profvanselow.ProductionTabsController">
+<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="530.0" prefWidth="620.0" tabClosingPolicy="UNAVAILABLE" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="io.github.profvanselow.ProductionTabsController">
   <stylesheets>
     <URL value="@Prod.css" />
   </stylesheets>
@@ -57,6 +57,16 @@
   <Tab text="Production Log">
     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
       <TextArea fx:id="taViewProd" layoutX="14.0" layoutY="14.0" prefHeight="480.0" prefWidth="595.0" />
+    </AnchorPane>
+  </Tab>
+  <Tab text="Employee">
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+      <TextArea fx:id="taEmployee" layoutX="8.0" layoutY="277.0" prefHeight="217.0" prefWidth="601.0" />
+         <Button layoutX="50.0" layoutY="148.0" mnemonicParsing="false" onAction="#createEmployee" text="Create Employee" />
+         <Label layoutX="50.0" layoutY="86.0" text="Password (must contain lowercase, uppercase, and special)" />
+         <Label layoutX="50.0" layoutY="25.0" text="Name (first last)" />
+         <TextField fx:id="txtEmpName" layoutX="50.0" layoutY="42.0" />
+         <TextField fx:id="txtPassword" layoutX="50.0" layoutY="103.0" />
     </AnchorPane>
   </Tab>
 </TabPane>
