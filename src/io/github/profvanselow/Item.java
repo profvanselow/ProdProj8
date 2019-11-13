@@ -1,6 +1,6 @@
 package io.github.profvanselow;
 
-public interface Item {
+interface Item {
 
   int getId();
 

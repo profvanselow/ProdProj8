@@ -10,11 +10,11 @@ public class ProductionRecord {
   private Date prodDate;
 
   public Date getProdDate() {
-    return prodDate;
+    return new Date(prodDate.getTime());
   }
 
   public void setProdDate(Date prodDate) {
-    this.prodDate = prodDate;
+    this.prodDate = new Date(prodDate.getTime());
   }
 
   public int getProductionNum() {
@@ -66,7 +66,7 @@ public class ProductionRecord {
     this.productionNum = prodNum;
     this.productID = productID;
     serialNum = sn;
-    prodDate = date;
+    prodDate = new Date(date.getTime());
   }
 
   public String toString() {

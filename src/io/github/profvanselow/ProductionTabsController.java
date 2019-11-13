@@ -1,5 +1,6 @@
 package io.github.profvanselow;
 
+import java.io.FileInputStream;
 import java.sql.Connection;
 import java.util.Date;
 import java.sql.DriverManager;
@@ -9,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Properties;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -109,9 +111,18 @@ public class ProductionTabsController {
     final String JDBC_DRIVER = "org.h2.Driver";
     final String DB_URL = "jdbc:h2:./res/ProdDB";
 
+    Properties prop = new Properties();
+    String PASS = "";
+    try {
+      prop.load(new FileInputStream("res/properties"));
+      PASS = prop.getProperty("password");
+    } catch (Exception ex) {
+      System.out.println("Error opening file " + ex);
+    }
+
     //  Database credentials
     final String USER = "";
-    final String PASS = "dbpw";
+    //final String PASS = "dbpw";
 
     System.out.println("Attempting to connect to database");
     try {
@@ -176,7 +187,7 @@ public class ProductionTabsController {
       ps.setString(2, pMan);
       ps.setString(3, pName);
       ps.executeUpdate();
-
+      ps.close();
       System.out.println("Product added to database.");
       //Product newProduct = new Widget(pName, pMan, iType);
       //taProductLine.appendText(newProduct.toString() + "\n");
