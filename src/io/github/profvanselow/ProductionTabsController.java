@@ -2,7 +2,6 @@ package io.github.profvanselow;
 
 import java.io.FileInputStream;
 import java.sql.Connection;
-import java.util.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Properties;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,8 +17,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -31,8 +33,8 @@ public class ProductionTabsController {
   private Connection conn = null;
   private Statement stmt = null;
 
-  private final ArrayList<Product> productLine = new ArrayList<>();
-  private ObservableList<Product> oProductLine;
+  //private final ArrayList<Product> productLine = new ArrayList<>();
+  private ObservableList<Product> olProductLine;
 
   private int countOfAudio = 0;
   private int countOfAudioMobile = 0;
@@ -40,6 +42,9 @@ public class ProductionTabsController {
   private int countOfVisualMobile = 0;
 
   private final ArrayList<ProductionRecord> productionLog = new ArrayList<>();
+
+  @FXML
+  private Label lblProductLineMessage;
 
   @FXML
   private TextField txtProductName;
@@ -73,6 +78,9 @@ public class ProductionTabsController {
   @FXML
   private ListView<Product> lvProductLine;
 
+  /**
+   * Automatically called when controller is loaded. Loads data from database.
+   */
   public void initialize() {
 
     // test Employee
@@ -102,49 +110,53 @@ public class ProductionTabsController {
     //initializeDB();
 
     // Convert the productLine ArrayList to an ObservableList to use with the TableView
-    oProductLine = FXCollections.observableArrayList(productLine); // using ArrayList
+    olProductLine = FXCollections.observableArrayList(); // could also be done using ArrayList
 
     setupProductLineTable();
-    lvProductLine.setItems(oProductLine);
+    lvProductLine.setItems(olProductLine);
     loadProductList();
     loadProductionLog();
   }
 
   private void testEmployee() {
-     // System.out.println("Enter Employee Name (first last)");
-      String name = "Tim";
-      //System.out.println("Enter Employee password");
-      String password = "aBcd!";
-      Employee employee = new Employee(name, password);
-      System.out.println(employee);
+    // System.out.println("Enter Employee Name (first last)");
+    String name = "Tim";
+    //System.out.println("Enter Employee password");
+    String password = "aBcd!";
+    Employee employee = new Employee(name, password);
+    System.out.println(employee);
   }
 
   private void initializeDatabase() {
-    final String JDBC_DRIVER = "org.h2.Driver";
-    final String DB_URL = "jdbc:h2:./res/ProdDB";
+    final String jdbcDriver = "org.h2.Driver";
+    final String dbUrl = "jdbc:h2:./res/ProdDB";
 
     Properties prop = new Properties();
-    String PASS = "";
+    String pass = "";
     try {
       prop.load(new FileInputStream("res/properties"));
-      PASS = prop.getProperty("password");
+      pass = prop.getProperty("password");
     } catch (Exception ex) {
       System.out.println("Error opening file " + ex);
+      Alert a = new Alert(Alert.AlertType.ERROR, "Error retrieving database password "
+          + "from properties file.", ButtonType.OK);
+      a.show();
     }
 
     //  Database credentials
-    final String USER = "";
-    //final String PASS = "dbpw";
+    final String user = "";
+    //final String pass = "dbpw";
 
     System.out.println("Attempting to connect to database");
     try {
-      Class.forName(JDBC_DRIVER);
-      conn = DriverManager.getConnection(DB_URL, USER, PASS);
+      Class.forName(jdbcDriver);
+      conn = DriverManager.getConnection(dbUrl, user, pass);
       stmt = conn.createStatement();
       System.out.println("Successfully connected to database!");
     } catch (Exception e) {
       e.printStackTrace();
-      Alert a = new Alert(Alert.AlertType.ERROR);
+      Alert a = new Alert(Alert.AlertType.ERROR, "Error connecting to database",
+          ButtonType.OK);
       a.show();
     }
   }
@@ -157,7 +169,7 @@ public class ProductionTabsController {
       System.out.println("Database closed.");
     } catch (Exception ex) {
       ex.printStackTrace();
-      Alert a = new Alert(Alert.AlertType.ERROR);
+      Alert a = new Alert(Alert.AlertType.ERROR, "Error closing database.");
       a.show();
     }
   }
@@ -185,36 +197,61 @@ public class ProductionTabsController {
   // Product **************************************************************************************
   @FXML
   void addProduct(ActionEvent event) {
+    lblProductLineMessage.setText("");
+    if (txtProductName.getText().length() > 0) {
+      if (txtManufacturer.getText().length() > 0) {
+        if (cbType.getValue() != null) {
+          System.out.println("Adding Product");
+          //String pType = cbType.getValue().toString();
+          ItemType itemType = cbType.getValue();
+          String prodMan = txtManufacturer.getText();
+          String prodName = txtProductName.getText();
+          initializeDatabase();
+          final String sql = "INSERT INTO Product(type, manufacturer, name) VALUES (?, ?, ?)";
 
-    System.out.println("Adding Product");
-    //String pType = cbType.getValue().toString();
-    ItemType iType = cbType.getValue();
-    String pMan = txtManufacturer.getText();
-    String pName = txtProductName.getText();
-    initializeDatabase();
-    try {
-      final String sql = "INSERT INTO Product(type, manufacturer, name) VALUES (?, ?, ?)";
-      PreparedStatement ps = conn.prepareStatement(sql);
-      ps.setString(1, iType.code);
-      ps.setString(2, pMan);
-      ps.setString(3, pName);
-      ps.executeUpdate();
-      ps.close();
-      System.out.println("Product added to database.");
-      //Product newProduct = new Widget(pName, pMan, iType);
-      //taProductLine.appendText(newProduct.toString() + "\n");
-      loadProductList();
+          try {
+            PreparedStatement ps = null;
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, itemType.code);
+            ps.setString(2, prodMan);
+            ps.setString(3, prodName);
+            ps.executeUpdate();
 
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } finally {
-      closeDatabase();
+            System.out.println("Product added to database.");
+            //Product newProduct = new Widget(pName, prodMan, iType);
+            //taProductLine.appendText(newProduct.toString() + "\n");
+            loadProductList();
+
+            ps.close();
+          } catch (SQLException ex) {
+            ex.printStackTrace();
+
+          } catch (Exception e) {
+            e.printStackTrace();
+          } finally {
+            closeDatabase();
+          }
+          txtManufacturer.setText("");
+          txtProductName.setText("");
+        } else {
+          lblProductLineMessage.setText("Item Type must be set");
+          cbType.requestFocus();
+        }
+      } else {
+        lblProductLineMessage.setText("Manufacturer cannot be empty");
+        txtManufacturer.requestFocus();
+      }
+
+    } else {
+      lblProductLineMessage.setText("Product name cannot be empty");
+      txtProductName.requestFocus();
     }
+
   }
 
   private void setupProductLineTable() {
 
-    TableColumn<Product, String> productIdCol = new TableColumn("Product ID");
+    TableColumn<Product, String> productIdCol = new TableColumn<>("Product ID");
     productIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
 
     TableColumn<Product, String> productNameCol = new TableColumn<>("Product Name");
@@ -228,7 +265,7 @@ public class ProductionTabsController {
     TableColumn<Product, String> itemTypeCol = new TableColumn<>("Item Type");
     itemTypeCol.setCellValueFactory(new PropertyValueFactory<>("type"));
 
-    tvProductLine.setItems(oProductLine);
+    tvProductLine.setItems(olProductLine);
     tvProductLine.getColumns().addAll(productIdCol, productNameCol, manufacturerCol, itemTypeCol);
 
   }
@@ -238,7 +275,7 @@ public class ProductionTabsController {
     try {
       String sql = "SELECT id, name, type, manufacturer FROM Product";
       ResultSet rs = stmt.executeQuery(sql);
-      oProductLine.clear();
+      olProductLine.clear();
       while (rs.next()) {
         int id = rs.getInt("id");
         String name = rs.getString("name");
@@ -264,8 +301,8 @@ public class ProductionTabsController {
         String manufacturer = rs.getString("manufacturer");
 
         Product addedProduct = new Widget(id, name, manufacturer, type);
-        productLine.add(addedProduct);
-        oProductLine.add(addedProduct);
+        //productLine.add(addedProduct);
+        olProductLine.add(addedProduct);
         // taProductLine.appendText(addedProduct.toString() + "\n"); // for TextArea instead
 
       }
@@ -283,7 +320,7 @@ public class ProductionTabsController {
   //</editor-fold>
 
   //<editor-fold desc="Production">
-  // Production *************************************************************************************
+  // Production ***********************************************************************************
   @FXML
   void recordProduction(ActionEvent event) {
     System.out.println("in recordProduction");
@@ -322,7 +359,8 @@ public class ProductionTabsController {
       productionRun.add(pr);
     }
 
-    // send collection to database and append newly produced items to observable list to update interface
+    // send collection to database and append newly produced items to observable list to update
+    // interface
     addToProductionDB(productionRun);
     loadProductionLog();
     showProduction();
@@ -343,7 +381,7 @@ public class ProductionTabsController {
 
       id = pr.getProductID();
 
-      for (Product product : productLine) {
+      for (Product product : olProductLine) {
         if (product.getId() == id) {
           productName = product.getName();
           break;
@@ -352,8 +390,8 @@ public class ProductionTabsController {
 
       fieldContent.append("Prod. Num: ").append(pr.getProductionNum())
           .append(" Product Name: ")
-          .append(productName).append(" Serial Num: ").append(pr.getSerialNum()).append(" Date: ").
-          append(pr.getProdDate()).append("\n");
+          .append(productName).append(" Serial Num: ").append(pr.getSerialNum()).append(" Date: ")
+          .append(pr.getProdDate()).append("\n");
 
     }
     taViewProd.setText(fieldContent.toString());
@@ -365,18 +403,18 @@ public class ProductionTabsController {
     try {
       System.out.println("Inserting production records in database.");
       Timestamp ts;
-
-      //TODO: make one big insert string so there is only one SQL statement to execute
+      PreparedStatement ps = null;
       for (ProductionRecord pr : productionRun) {
         ts = new Timestamp(pr.getProdDate().getTime());
         final String sql = "INSERT INTO PRODUCTIONRECORD (PRODUCT_ID, SERIAL_NUM, DATE_PRODUCED)"
             + " VALUES (?, ?, ?)";
-        PreparedStatement ps = conn.prepareStatement(sql);
+        ps = conn.prepareStatement(sql);
         ps.setInt(1, pr.getProductID());
         ps.setString(2, pr.getSerialNum());
         ps.setTimestamp(3, ts);
         ps.executeUpdate();
         System.out.println("Record inserted in database.");
+        ps.close();
       }
       System.out.println("Completed inserting production records!");
     } catch (SQLException se) {
@@ -398,22 +436,23 @@ public class ProductionTabsController {
     initializeDatabase();
     try {
 
-      // to use just ProductionRecord table
-      String sql = "SELECT * FROM PRODUCTIONRECORD";
-
       // to join tables to show product name instead of id
-      //String sql = "SELECT PRODUCTIONRECORD.PRODUCTION_NUM, PRODUCTIONRECORD.product_id, PRODUCT.NAME, " +
+      //String sql = "SELECT PRODUCTIONRECORD.PRODUCTION_NUM, PRODUCTIONRECORD.product_id,
+      // PRODUCT.NAME, " +
       //        "PRODUCTIONRECORD.SERIAL_NUM, PRODUCTIONRECORD.DATE_PRODUCED " +
       //        "FROM PRODUCTIONRECORD " +
       //        "INNER JOIN PRODUCT ON PRODUCTIONRECORD.PRODUCT_ID=PRODUCT.ID";
-
-      ResultSet rs = stmt.executeQuery(sql);
 
       productionLog.clear();
       countOfAudio = 0;
       countOfVisualMobile = 0;
       countOfVisual = 0;
       countOfAudioMobile = 0;
+
+      // to use just ProductionRecord table
+      String sql = "SELECT * FROM PRODUCTIONRECORD";
+
+      ResultSet rs = stmt.executeQuery(sql);
 
       while (rs.next()) {
         int prodNum = rs.getInt("production_num");
@@ -444,7 +483,8 @@ public class ProductionTabsController {
       showProduction();
     } catch (SQLException se) {
       se.printStackTrace();
-      Alert a = new Alert(Alert.AlertType.ERROR);
+      Alert a = new Alert(Alert.AlertType.ERROR, "Error loading production log",
+          ButtonType.OK);
       a.show();
 
     } catch (Exception e) {

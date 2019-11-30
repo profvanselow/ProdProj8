@@ -33,10 +33,10 @@ class Employee {
         lowerCount++;
       } else if (Character.isUpperCase(password.charAt(i))) {
         upperCount++;
-      } else if (password.substring(i, i+1).matches("[^A-Za-z0-9]")) {
+      } else if (password.substring(i, i + 1).matches("[^A-Za-z0-9]")) {
         specialCount++;
       }
-    }//endfor
+    } //endfor
     if (lowerCount > 0 && upperCount > 0 && specialCount > 0) {
       return true;
     } else {

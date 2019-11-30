@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="530.0" prefWidth="620.0" tabClosingPolicy="UNAVAILABLE" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="io.github.profvanselow.ProductionTabsController">
+<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="530.0" prefWidth="620.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.github.profvanselow.ProductionTabsController">
   <stylesheets>
     <URL value="@Prod.css" />
   </stylesheets>
@@ -39,10 +39,11 @@
           <TextField fx:id="txtManufacturer" GridPane.columnIndex="1" GridPane.rowIndex="1" />
           <ChoiceBox fx:id="cbType" prefHeight="25.0" prefWidth="292.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
       </GridPane>
-      <Button fx:id="btnAddProduct" layoutX="456.0" layoutY="125.0" mnemonicParsing="false" onAction="#addProduct" text="Add Product" />
+      <Button fx:id="btnAddProduct" layoutX="512.0" layoutY="123.0" mnemonicParsing="false" onAction="#addProduct" text="Add Product" />
       <Label layoutX="38.0" layoutY="150.0" text="Existing Products" />
       <TextArea fx:id="taProductLine" layoutX="29.0" layoutY="179.0" prefHeight="310.0" prefWidth="571.0" />
       <TableView fx:id="tvProductLine" layoutX="29.0" layoutY="179.0" prefHeight="280.0" prefWidth="570.0" />
+         <Label fx:id="lblProductLineMessage" layoutX="146.0" layoutY="127.0" text="Label" />
     </AnchorPane>
   </Tab>
   <Tab text="Produce">
