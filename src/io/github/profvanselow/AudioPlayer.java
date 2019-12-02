@@ -1,12 +1,21 @@
 package io.github.profvanselow;
 
-// Step 5
-// Create class AudioPlayer that is a subclass of Product and implements MultimediaControl interface
+/**
+ * Create class AudioPlayer that is a subclass of Product and implements MultimediaControl interface
+ * @author sdvansel
+ */
 public class AudioPlayer extends Product implements MultimediaControl {
 
   private final String supportedAudioFormats;
   private final String supportedPlaylistFormats;
 
+  /**
+   * Sets the fields specific to AudioPlayer and passes others to super.
+   * @param n The name of the product as a string.
+   * @param m The name of the manufacturer as a string.
+   * @param saf The Supported Audio Formats that the player can use.
+   * @param spf The playlist formats that the player supports.
+   */
   AudioPlayer(String n, String m, String saf, String spf) {
     super(n, m, ItemType.AUDIO);
     this.supportedAudioFormats = saf;
